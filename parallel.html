@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head> 
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Yuri Emelianov & Lior Portnoy</title>
+    <link rel="stylesheet" type="text/css" href="parallel.css" />
+  </head>
+  <body>
+  <div id="header">
+	
+    <h1 align="center">Final poject: Visualization with Parallel Coordinates [Yuri Emelianov & Lior Portnoy, 08.2017]</h1><br>
+    <input type="file" id="uploader">
+	Options for chart data manipulation: 
+	<button title="Zoom in on selected data" id="keep-data" style="background-color:white; color:white;"><text style="color:black">Keep</text></button>
+    <button title="Remove selected data" id="exclude-data" style="background-color:white"><text style="color:black">Exclude</text></button>
+    <button title="Export data as CSV" id="export-data" style="background-color:white"><text style="color:black">Export</text></button>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Options for chart manipulation:   
+	  <span class="settings">
+        <button id="hide-ticks">Hide Ticks</button>
+        <button id="show-ticks" disabled="disabled">Show Ticks</button>
+      </span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#Active elements: <strong id="rendered-count"></strong>/<strong id="selected-count"></strong>
+      <div class="fillbar"><div id="selected-bar"><div id="rendered-bar">&nbsp;</div></div></div>
+    <div style="clear:both;"></div>
+  </div>
+  <div id="chart">
+    <canvas id="background"></canvas>
+    <canvas id="foreground"></canvas>
+    <canvas id="highlight"></canvas>
+    <svg></svg>
+  </div>
+  <div id="wrap">
+      <div  class="third" width="100%" style="overflow: hidden">
+      <h3>Wine Groups</h3>
+      <p id="legend" width="100%" style="overflow: hidden">
+      </p>
+    </div>
+   <div class="third" style="visibility: hidden; max-width: 10px; max-height: 10px;">
+      <h3>Sample of 25 entries <input type="text" id="search" placeholder="Search Wines..."></input></h3>
+      <p id="wines-list">
+      </p>
+    </div>
+    </br>
+	<div class="third" id="controls">
+      <div class="little-box" style="min-width: 1000px; max-height: 300px;">
+
+        <h3 style="color:red">Description</h3>
+        <p>
+          A multidimensional explorer of <a href="winequality.csv">Wine data</a> from the <a href="http://archive.ics.uci.edu/ml/datasets/Wine+Quality">UCI</a>.
+		</p>
+        <p>
+          The parallel coordinates displays the features of wine in the database across 11 dimensions, colored by wine type(red/white). 
+        </p>
+
+        <h3 style="color:red">Data Set Information</h3>
+        <p>
+          The two datasets are related to red & white variants of the Portuguese "Vinho Verde" wine<br/>
+          <strong>Features:</strong>:<br/>
+		  <strong>1: </strong>Quality(0..10) based on sensory data&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>2: </strong>Alcohol&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>3: </strong>Chlorides&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>4: </strong>Citric Acid
+		  <strong>5: </strong>Density&nbsp;&nbsp;&nbsp;
+          <strong>6: </strong>Fixed Acidity&nbsp;&nbsp;<br/>
+          <strong>7: </strong>Free Sulfur Dioxidenbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>8: </strong>pH
+		  <strong>9: </strong>Residual Sugar&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>10:</strong>Sulphates&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>11:</strong>Total Sulfur Dioxide&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>12:</strong>Volatile Acidity<br/>
+        </p>
+		  <h3 style="color:red">Controls</h3>
+        <p>
+          <strong>Brush</strong>: Drag vertically along an axis.<br/>
+          <strong>Remove Brush</strong>: Tap the axis background.<br/>
+          <strong>Reorder Axes</strong>: Drag a label horizontally.<br/>
+          <strong>Invert Axis</strong>: Tap an axis label.<br/>
+          <strong>Remove Axis</strong>: Drag axis label to the left edge.
+        </p>
+      </div>
+    </div>
+  </div>
+  </body>
+  
+  <script>
+  function loadScriptIntoPage(src, isSync) {
+    let extension = src.split('.').pop();
+    let type = "";
+    if (extension == "css") {
+        type = "text/css";
+    }
+    else if(extension == "js") {
+        type = "text/javascript";
+    }
+    else {
+        alert("can't load this file:" + src);
+    }
+
+    let s = document.createElement('script');
+    s.type = type;
+    if (isSync) {
+        s.sync = true;
+        s.async = false;
+    }
+    else {
+        s.async = true;
+        s.sync = false;
+    }
+    s.src = src;
+    let x = document.getElementsByTagName('script')[0];
+    x.parentNode.insertBefore(s, x);
+    return x;
+}
+
+	// CSV Uploader
+	var uploader = document.getElementById("uploader");  
+	var reader = new FileReader();
+	var data = [];
+	reader.onload = function(e) {
+	  var contents = e.target.result;
+	  
+	  data = d3.csv.parse(contents);
+	  loadScriptIntoPage("parallel.js", "text/javascript", true);
+  	  
+	  //group,fixed acidity,volatile acidity,citric acid,residual sugar,
+	  //chlorides,free sulfur dioxide,total sulfur dioxide,density,pH,
+	  //sulphates,alcohol,quality
+	  uploader.parentNode.removeChild(uploader);
+	};
+
+	uploader.addEventListener("change", handleFiles, false);  
+
+	function handleFiles() {
+	  var file = this.files[0];
+	  reader.readAsText(file);
+	};
+  </script>
+  <script src="http://d3js.org/d3.v2.js"></script>
+  <script src="http://underscorejs.org/underscore.js"></script>
+</html>
